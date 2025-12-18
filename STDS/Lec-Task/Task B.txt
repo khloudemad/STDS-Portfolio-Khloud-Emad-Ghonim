@@ -1,47 +1,39 @@
-## **Task B: Transformation Logic & Business Rules Design**
+# Transformation Layer: Business Rules & Logic
 
+The transformation phase applies a sequence of data science-driven rules to address inconsistent units, missing values, inefficient formats, and basic fault detection. Rules are designed to be idempotent, traceable, and focused on producing high-quality data for downstream analytics (peak detection, forecasting, anomaly monitoring).
 
+### Rule 1: Unit Standardization
+If the reported unit is "W" (Watts), divide the energy value by 1000 and update the unit to "kW" (Kilowatts). If already in "kW", leave unchanged.  
+Add a metadata flag: unit_converted: true/false.  
+*Rationale*: Ensures consistent scale across all records, preventing aggregation errors in peak consumption analysis.
 
-### **1. Unit Standardization Rules**
+### Rule 2: Handling Missing Values
+If the energy reading is NULL or missing:  
+- Flag the record with missing_value: true.  
+- Exclude from immediate aggregate calculations (e.g., peak usage).  
+- For gaps < 1 hour, apply forward-fill from the last valid reading (same meter).  
+- For larger gaps, leave as NULL and log for further investigation.  
+*Rationale*: Preserves time-series continuity where reasonable while avoiding artificial imputation bias in forecasting models.
 
-**Rule 1:** IF energy_unit = "W" THEN energy_value = energy_value / 1000 AND energy_unit = "kW"  
+### Rule 3: Data Validation & Outlier Detection
+Validate post-standardized values:  
+- Flag if kW > 10 (unrealistic for typical household) or kW < 0 (invalid).  
+- Compute rolling z-score over a 24-hour window per meter; flag if |z-score| > 3 as outlier.  
+Invalid or outlier records are routed to error queue for retry or manual review.  
+*Rationale*: Removes gross errors that could skew statistical models and analytics.
 
-**Rule 2:** IF energy_unit = "kwh" OR energy_unit = "KWH" THEN energy_unit = "kW" (standardize naming)  
+### Rule 4: Basic Faulty Meter Detection
+Track consecutive near-zero readings (< 0.01 kW) per meter:  
+- If > 24 consecutive hours of near-zero, mark meter as potentially_faulty and flag all related records.  
+- If daily total consumption = 0 for > 3 consecutive days, trigger operational alert.  
+*Rationale*: Early heuristic-based detection of meter failures using time-series patterns, preparing data for advanced ML-based fault prediction.
 
-**Rule 3:** IF energy_unit NOT IN ["W", "kW"] THEN energy_unit = "kW" (assume default) AND flag = "ASSUMED_UNIT"
+### Rule 5: Timestamp Normalization & Deduplication
+- Convert all timestamps to UTC.  
+- Ensure monotonic increasing order per meter.  
+- If duplicate (same meter_id + timestamp), retain the most recent value and flag duplicate_resolved: true.  
+*Rationale*: Guarantees accurate temporal alignment critical for time-based analytics and forecasting.
 
-
-
-### **2. Missing Values Rules**
-
-**Rule 4:** IF energy_value IS NULL THEN status = "MISSING_VALUE" AND exclude_from_peak_calculations = TRUE  
-
-**Rule 5:** IF timestamp IS NULL THEN timestamp = previous_timestamp + 15_minutes AND status = "INFERRED_TIME"
-
-**Rule 6:** IF meter_id IS NULL THEN REJECT_RECORD COMPLETELY  
-
-
-
-### **3. Data Validation Rules**
-
-**Rule 7:** IF energy_value < 0 THEN status = "INVALID_NEGATIVE" AND reject_from_analytics = TRUE  
-
-**Rule 8:** IF energy_value_kw > 50 AND meter_type = "RESIDENTIAL" THEN status = "SUSPICIOUSLY_HIGH" AND requires_manual_review = TRUE
-
-**Rule 9:** IF ABS(current_value - previous_value) > 30 AND time_gap = 15_min THEN status = "ABRUPT_CHANGE"
-
-**Rule 10:** IF timestamp > current_time + 5_minutes THEN timestamp = current_time AND status = "TIME_CORRECTED"
-
-
-
-### **4. Faulty Meter Detection Rules**
-
-**Rule 11:** IF energy_value = 0 FOR 24_consecutive_hours THEN meter_status = "POTENTIAL_FAULTY" AND generate_maintenance_ticket = TRUE  
-
-**Rule 12:** IF standard_deviation(last_48h_readings) < 0.01 THEN meter_status = "POTENTIAL_STUCK_METER"
-
-**Rule 13:** IF reading_pattern = "ALL_IDENTICAL_VALUES" THEN meter_status = "SUSPICIOUS_PATTERN"
-
-**Rule 14:** IF consumption < 10%_of_neighborhood_average AND duration > 7_days THEN meter_status = "ABNORMALLY_LOW"
-
-**Rule 15:** IF last_reading > 72_hours_ago THEN meter_status = "OFFLINE" AND communication_alert = TRUE
+*Additional Controls*:
+- Log pre- and post-transformation statistics (e.g., % missing, % converted, % flagged).
+- All flags stored as metadata columns for auditability and downstream filtering.
