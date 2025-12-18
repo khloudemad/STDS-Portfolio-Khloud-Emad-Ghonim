@@ -1,51 +1,30 @@
-1. Upload to Raw Storage
+# Lifecycle of a Single Smart Meter Record
 
-The record arrives as part of a raw CSV file (e.g., meter_id=123, timestamp=2025-12-17T12:00:00, energy=500, unit=W) from the smart meter via API or batch upload. It's stored unchanged in a raw storage bucket (object storage like AWS S3). This serves as the "landing zone" for dark data, preserving the original format for auditing and compliance.
+This step-by-step explanation traces one individual reading from ingestion to archival.
 
+1. *Upload to Raw Storage*  
+   The smart meter sends a reading (part of a CSV batch) which is automatically uploaded to the raw object storage bucket (landing zone).
 
+2. *Triggering the Transformation Process*  
+   The file upload event automatically triggers the serverless extraction function, which parses the CSV and processes records individually or in micro-batches.
 
-2. Triggering of the Transformation Process
+3. *Data Cleaning and Validation*  
+   The record undergoes sequential transformation:  
+   - Unit standardization (Rule 1).  
+   - Missing value handling (Rule 2).  
+   - Outlier and validity checks (Rule 3).  
+   - Faulty meter logic (Rule 4).  
+   - Timestamp normalization and deduplication (Rule 5).  
+   If any validation fails, the record is sent to an error queue with up to 3 automatic retries. Persistent failures go to a dead-letter queue with admin alert.
 
-The file upload event automatically triggers serverless orchestration (e.g., AWS Lambda). The orchestrator parses the CSV, extracts individual records, and invokes the transformation layer. If the initial trigger fails (due to high load or network issues), it automatically retries up to 3 times before logging an error for manual intervention.
+4. *Load to Structured Storage*  
+   Upon successful transformation and validation, the cleaned record is inserted into a relational database (e.g., tabular schema with meter_id, timestamp, kW, flags). This enables easy querying, manual validation, and operational dashboards.
 
+5. *Conversion and Archival in Parquet Format*  
+   After successful load (or in parallel via batch), transformed records are aggregated and converted to Parquet (columnar format) and stored in an analytics-optimized long-term archive. This supports efficient historical queries using tools like Athena, Spark, or BigQuery.
 
+6. *Success vs. Failure Handling*  
+   - *Success Path*: Full lifecycle completes automatically; success logged in monitoring system.  
+   - *Failure Path*: After max retries, record remains in raw storage, flagged in dead-letter queue, and alerts sent for manual intervention. Original raw data preserved for reproducibility.
 
-3. Data Cleaning and Validation Steps
-
-In the transformation function:
-
-Parsing: Extract fields from the CSV record
-
-Unit Standardization: Convert 500 W → 0.5 kW (divide by 1000)
-
-Null Checking: Verify no missing values
-
-Range Validation: Ensure energy value is within acceptable limits (0-50 kW for residential)
-
-Fault Detection: Check time-series context; if part of 24+ hour zero-streak, flag as potentially faulty
-
-Metadata Enrichment: Add cleaned timestamp (UTC), processing ID, and quality score
-If validation fails (e.g., invalid range or format), the record is flagged and routed to the error path.
-
-
-
-4. Storage in Structured Format (RDS)
-
-The cleaned record is loaded into a structured database (RDS table like cleaned_readings with columns: meter_id, timestamp, energy_kW, flags, quality_score). This enables immediate SQL queries for validation (peak detection) and real-time insights. If the insert fails (database connection issue), the system retries 3 times with exponential backoff; on persistent failure, sends to Dead Letter Queue (DLQ) and triggers an alert.
-
-
-
-
-5. Conversion and Archival in Parquet Format
-
-Simultaneously, the record is converted to Parquet format (optimized for columnar analytics) and appended to partitioned files in archival storage (organized by date/hour/meter_id). Parquet automatically handles compression (reducing storage by ~80%) and schema enforcement, preparing the data for long-term analysis like forecasting and trend detection.
-
-
-
-
-6. How Success or Failure is Handled
-
-On Success: The orchestrator logs completion metrics. The record becomes available in both RDS (for operational queries) and Parquet storage (for analytical queries), enabling peak detection and dashboard updates immediately.
-
-On Failure (during transform/validation): The system retries the failed step up to 3 times with exponential backoff. If all retries fail, the record moves to a DLQ for manual inspection, triggers an alert (email/SNS), and is excluded from downstream analytics to prevent bad data propagation. This ensures pipeline resilience with minimal manual intervention.
-
+*Outcome*: Each record emerges as clean, standardized, flagged (where needed), and available in both query-friendly and analytics-optimized formats—ready for peak analysis, forecasting models, and operational insights.
