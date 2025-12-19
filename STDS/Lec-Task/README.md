@@ -4,7 +4,7 @@ This project documents a **conceptual serverless ETL pipeline** for processing e
 
 ## 📍 Task A: System Design – ETL Architecture Diagram
 
-![ETL Pipeline Architecture](Diagrams/ETL%20Pipeline%20Flow.png)
+![ETL Pipeline Architecture](Diagrams/ETL%20Flow.png)
 
 > **Key Components**:
 > - **Source**: Raw CSV uploads from smart meters
