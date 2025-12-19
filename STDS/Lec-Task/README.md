@@ -48,13 +48,21 @@ All flags stored as metadata for audit and filtering.
 
 ## 📂 Repository Structure
 GreenStream Energy ETL Design/
+
 ├── README.md                          ← Project overview (this file)
+
 ├── GreenStream ETL Pipeline Design.md ← Master Obsidian note (main document)
+
 ├── Business Rules.md                  ← Detailed transformation rules
+
 ├── Single Record Lifecycle.md         ← Record processing journey
+
 ├── Diagrams/
+
 │   ├── ETL Pipeline Flow.canvas       ← Interactive Canvas diagram
+
 │   └── ETL Pipeline Flow.png          ← Exported static image (shown above)
+
 └── Attachments/                       ← Optional supporting files
 
 
