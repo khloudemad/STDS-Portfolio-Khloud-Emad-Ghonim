@@ -47,7 +47,7 @@ All flags stored as metadata for audit and filtering.
 - Add data lineage tracking and quality metrics dashboard
 
 ## 📂 Repository Structure
- GreenStream Energy ETL Design/
+GreenStream Energy ETL Design/
 ├── README.md                          ← Project overview (this file)
 ├── GreenStream ETL Pipeline Design.md ← Master Obsidian note (main document)
 ├── Business Rules.md                  ← Detailed transformation rules
