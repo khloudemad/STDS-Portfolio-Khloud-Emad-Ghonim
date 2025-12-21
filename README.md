@@ -1,34 +1,86 @@
-# STDS Portfolio - Khloud Emad Ghonim
+# 📊 Data Analysis & Data Engineering Portfolio – Selected Projects
 
-## Portfolio Overview
-
-This portfolio showcases a series of data engineering, analytics, and business intelligence projects developed as part of the **STDS (Selected Topics in Data Science)** course. Each project demonstrates proficiency in different tools, technologies, and methodologies for handling real-world data challenges — from serverless ETL pipelines to interactive dashboards for strategic decision-making.
-
-### Lecture Task: Smart Meter Energy Data ETL Pipeline
-A scalable, serverless ETL solution built on AWS to process smart meter readings from over 50,000 households.  
-The pipeline automatically ingests raw CSV files, applies rigorous business rules for data cleaning and validation, stores structured data in RDS for real-time querying, and archives optimized Parquet files for long-term analytics. It includes advanced fault detection, retry mechanisms, and error handling to ensure data reliability for energy monitoring, forecasting, and predictive maintenance.
-
-### Excel Task: CRM Sales Performance Dashboard
-An interactive Power BI dashboard that transforms raw CRM sales data into actionable insights.  
-It enables sales managers to track revenue trends, monitor deal outcomes (Won, Lost, Engaged), evaluate sales agent and manager performance through win rates, and analyze revenue distribution by product, region, sector, and account — supporting faster, data-driven sales strategies.
-
-### Database Excel Task: Education Management System Dashboard
-A comprehensive Excel-based analytics solution designed for educational institutions.  
-Using pivot tables and interactive visualizations, it provides clear insights into student enrollment, instructor performance, course popularity, grade distributions, and evaluation metrics across departments — empowering administrators to monitor academic trends and make informed operational decisions.
-
-### Power BI Task: AdventureWorks Analytics Dashboard
-A professional Power BI solution delivering enterprise-grade business intelligence from the AdventureWorks dataset.  
-It offers in-depth visibility into sales performance, financial KPIs (total due, subtotals, taxes, freight), product category analysis, regional comparisons, shipping trends, and temporal patterns — enabling stakeholders to identify growth opportunities and optimize operations.
-
-### Tableau Task: Adidas Sales & Profit Analysis Dashboard
-An advanced Tableau dashboard analyzing Adidas U.S. sales performance from 2020–2022, encompassing $899.90M in total sales, $332.13M in profit, and 2.48M units sold across 9,648 retailers.  
-It provides geographic visualizations, revenue trends, product and retailer performance, sales channel breakdowns (Online, Outlet, In-store), and regional insights — supporting strategic decisions in inventory management, marketing, and market expansion.
+This portfolio contains *five comprehensive projects* covering data analysis, visualization, database design, and data pipeline architecture using *Excel, SQL, Power BI, and conceptual ETL design*.
 
 ---
 
-**Technologies Used:**
-- AWS (Lambda, S3, Step Functions, Glue, RDS, SQS, SNS)
-- Power BI Desktop
-- Microsoft Excel (PivotTables & Dashboards)
-- Tableau
-- Data Modeling (Star Schema), DAX, ETL Design, Data Governance & Quality Rules
+## 🎓 *1. CRM Sales Performance Dashboard – Excel Dashboard*
+
+*Description:*  
+Interactive sales performance dashboard tracking deals, revenue, and agent performance.
+
+*Key Features:*
+- Won/Lost/Engaged deal tracking
+- Revenue analysis by product and region
+- Manager performance and win rate analytics
+
+*Tools:* Microsoft Excel
+
+---
+
+## 🗃️ *2. ITI Educational Database System – Excel & SQL Design*
+
+*Description:*  
+A structured database system for an educational institute, designed with Excel as the front-end and simulated SQL backend.
+
+*Key Features:*
+- Student, course, instructor, and enrollment tables
+- Data validation and relational integrity in Excel
+- Query-based reporting and analytics
+
+*Tools:* Excel, Database Design Principles
+
+---
+
+## 👟 *3. Adidas Sales & Profit Analysis – Tableau*
+
+*Description:*  
+Comprehensive US sales analysis for Adidas (2020–2022) with geographic and product insights.
+
+*Key Metrics:*
+- $899.90M total sales, $332.13M profit
+- 2.48M units sold, 9,648 retailers
+
+*Insights:*
+- Online sales lead (50.7%)
+- West region is top performer
+- Men's Street Footwear best-selling category
+
+*Tools:* Tableau
+
+---
+
+## 🚀 *4. AdventureWorks Analytics Dashboard – Power BI*
+
+*Description:*  
+Enterprise BI solution for sales, product, and customer analytics.
+
+*Key Metrics:*
+- $123.22M total due, 31K orders
+- 275K units sold
+
+*Tools:* Power BI, DAX, AdventureWorks Database
+
+---
+
+## ⚡ *5. GreenStream Energy – ETL Pipeline Design (Conceptual)*
+
+*Description:*  
+A *design thinking exercise* for a serverless ETL pipeline to process smart-meter data for a utility company.
+
+*Key Components:*
+- *ETL Architecture Diagram:* Source → Transformation → Destinations with error handling
+- *Business Rules:* Unit conversion, missing value handling, faulty meter detection
+- *Record Lifecycle:* From raw CSV to cleaned RDS and archived Parquet
+
+*Focus:* Data pipeline logic, transformation rules, and failure handling — *not implementation*.
+
+---
+
+## 🛠️ *Technologies Used*
+
+- *Excel:* Dashboards, Database Simulation, Advanced Formulas
+- *Power BI:* Interactive Dashboards, DAX, Data Modeling
+- *SQL / Database Design:* Relational structuring, query logic
+- *Python:* Data cleaning, transformation (Pandas)
+- *ETL Design:* Pipeline architecture, data validation, error handling
